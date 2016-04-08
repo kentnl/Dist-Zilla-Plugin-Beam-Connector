@@ -1,4 +1,4 @@
-use 5.006;  # our
+use 5.006;    # our
 use strict;
 use warnings;
 
@@ -10,11 +10,115 @@ our $VERSION = '0.001000';
 
 # AUTHORITY
 
-use Moose;
+use Moose qw( has around with );
+use Carp qw( croak );
+with 'Dist::Zilla::Role::Plugin';
 
+has 'on' => (
+  isa     => 'ArrayRef[Str]',
+  is      => 'ro',
+  default => sub { [] },
+);
+
+has '_on_parsed' => (
+  isa     => 'ArrayRef',
+  is      => 'ro',
+  lazy    => 1,
+  builder => '_build_on_parsed',
+);
+
+around mvp_multivalue_args => sub {
+  my ( $orig, $self, @args ) = @_;
+  return ( qw( on ), $self->$orig(@args) );
+};
+
+around plugin_from_config => sub {
+  my ( $orig, $plugin_class, $name, $arg, $own_section ) = @_;
+  my $instance = $plugin_class->$orig( $name, $arg, $own_section );
+  for my $connection ( @{ $instance->_on_parsed } ) {
+    $instance->_connect( $connection->{emitter}, $connection->{listener} );
+  }
+  return $instance;
+};
 
 __PACKAGE__->meta->make_immutable;
 no Moose;
+
+sub _parse_connector {
+  my ($connector) = @_;
+  if ( $connector =~ /\Aplugin:(.+?)[#]([^#]+)\z/sx ) {
+    return { type => 'plugin', name => "$1", connection => "$2", };
+  }
+  croak "Invalid connector specification \"$connector\"\n"    #
+    . q[Didn't match "plugin:<id>#<event|listener>"];
+}
+
+sub _parse_on_directive {
+  my ($connection_string) = @_;
+
+  # Remove leading padding
+  $connection_string =~ s/\A\s*//sx;
+  $connection_string =~ s/\s*\z//sx;
+  if ( $connection_string =~ /\A(.+)\s*=>\s*(.+)\z/sx ) {
+    my ( $emitter, $listener ) = ( $1, $2 );
+    return {
+      emitter  => _parse_connector($emitter),
+      listener => _parse_connector($listener),
+    };
+  }
+  croak "Can't parse 'on' directive \"$connection_string\"\n"    #
+    . q[Didn't match "emitter => listener"];
+}
+
+sub _find_connector {
+  my ( $self, $spec ) = @_;
+  if ( 'plugin' eq $spec->{type} ) {
+    my $plugin = $self->zilla->plugin_named( $spec->{name} );
+    return $plugin if defined $plugin;
+    croak "Can't resolve plugin \"$spec->{name}\" to an instance.\n"    #
+      . q[Did the plugin exist? Is the connection *after* it?];
+  }
+  croak "Unknown connector type \"$spec->{type}\"";
+}
+
+# This is to avoid making the sub a closure that contains the emitter
+sub _make_connector {
+  my ( $recipient, $method_name ) = @_;
+
+  # Maybe weak ref? IDK
+  return sub {
+    my ($event) = @_;
+    $recipient->$method_name($event);
+  };
+}
+
+sub _connect {
+  my ( $self, $emitter, $listener ) = @_;
+  my $emitter_object  = $self->_find_connector($emitter);
+  my $listener_object = $self->_find_connector($listener);
+
+  my $emit_name   = $emitter->{name};
+  my $listen_name = $listener->{name};
+
+  my $emit_on   = $emitter->{connection};
+  my $listen_on = $listener->{connection};
+
+  if ( not $emitter_object->can('on') ) {
+    croak qq[Emitter Target "$emit_name" has no "on" method to register listeners];
+  }
+  if ( not $listener_object->can($listen_on) ) {
+    croak qq[Listener Target "$listen_name" has no "$listen_on" method to recive events];
+  }
+
+  $emitter_object->on( $emit_on, $self->_make_connector( $listener_object, $listen_on ) );
+  return;
+
+}
+
+sub _build_on_parsed {
+  my ($self) = @_;
+  return [ map { _parse_on_directive($_) } @{ $self->on } ];
+}
 
 1;
 
