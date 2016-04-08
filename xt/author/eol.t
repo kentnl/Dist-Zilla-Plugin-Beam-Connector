@@ -10,7 +10,8 @@ my @files = (
     'lib/Dist/Zilla/Plugin/Beam/Connector.pm',
     't/00-compile/lib_Dist_Zilla_Plugin_Beam_Connector_pm.t',
     't/00-report-prereqs.dd',
-    't/00-report-prereqs.t'
+    't/00-report-prereqs.t',
+    't/example/neomake.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;
