@@ -16,5 +16,16 @@ $tzil->build;
 
 pass("Built ok");
 
+my $file_content = $tzil->slurp_file('build/Makefile.PL');
+
+my (@matches) = grep /win32/i, split /\n/, $file_content;
+
+# Importat: These lines are duplicates of each other
+note explain \@matches;
+
+is( scalar @matches, 4, "4 lines added referencing Win32" );
+is( scalar( grep /MSWin32/i,     @matches ), 2, "2 lines added referencing MSWin32" );
+is( scalar( grep /Unsupported/i, @matches ), 2, "2 lines added referencing Unsupported" );
+
 done_testing;
 
