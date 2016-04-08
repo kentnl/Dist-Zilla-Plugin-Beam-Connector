@@ -99,6 +99,8 @@
             "Moose" : "2.000"
          },
          "requires" : {
+            "Carp" : "0",
+            "Dist::Zilla::Role::Plugin" : "0",
             "Moose" : "0",
             "perl" : "5.006",
             "strict" : "0",
@@ -126,6 +128,17 @@
       }
    },
    "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kentnl/Dist-Zilla-Plugin-Beam-Connector/issues"
+      },
+      "homepage" : "https://github.com/kentnl/Dist-Zilla-Plugin-Beam-Connector",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kentnl/Dist-Zilla-Plugin-Beam-Connector.git",
+         "web" : "https://github.com/kentnl/Dist-Zilla-Plugin-Beam-Connector"
+      }
+   },
    "version" : "0.001000",
    "x_BuiltWith" : {
       "external_file" : "misc/built_with.json"

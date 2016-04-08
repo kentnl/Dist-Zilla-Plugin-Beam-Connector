@@ -84,6 +84,8 @@ do { my $x = {
                                         'Moose' => '2.000'
                                       },
                       'requires' => {
+                                      'Carp' => '0',
+                                      'Dist::Zilla::Role::Plugin' => '0',
                                       'Moose' => '0',
                                       'perl' => '5.006',
                                       'strict' => '0',

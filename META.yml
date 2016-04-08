@@ -24,8 +24,14 @@ provides:
 recommends:
   Moose: '2.000'
 requires:
+  Carp: '0'
+  Dist::Zilla::Role::Plugin: '0'
   Moose: '0'
   perl: '5.006'
   strict: '0'
   warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-Beam-Connector/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Plugin-Beam-Connector
+  repository: https://github.com/kentnl/Dist-Zilla-Plugin-Beam-Connector.git
 version: '0.001000'

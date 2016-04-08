@@ -1,6 +1,7 @@
 {
    "modules" : {
       "CPAN::Meta" : "2.150001",
+      "Carp" : "1.36",
       "Dist::Zilla" : "5.043",
       "Dist::Zilla::App::Command::bakeini" : "0.002005",
       "Dist::Zilla::Plugin::Author::KENTNL::CONTRIBUTING" : "0.001005",
@@ -53,6 +54,7 @@
       "Dist::Zilla::Plugin::Twitter" : "0.026",
       "Dist::Zilla::Plugin::UploadToCPAN" : "5.043",
       "Dist::Zilla::PluginBundle::Author::KENTNL" : "2.025010",
+      "Dist::Zilla::Role::Plugin" : "5.043",
       "English" : "1.09",
       "ExtUtils::MakeMaker" : "7.04_01",
       "File::Spec" : "3.56",
