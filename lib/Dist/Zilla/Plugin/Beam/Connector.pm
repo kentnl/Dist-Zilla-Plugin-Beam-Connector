@@ -84,7 +84,6 @@ sub _find_connector {
 # This is to avoid making the sub a closure that contains the emitter
 sub _make_connector {
   my ( $recipient, $method_name ) = @_;
-
   # Maybe weak ref? IDK
   return sub {
     my ($event) = @_;
@@ -110,7 +109,8 @@ sub _connect {
     croak qq[Listener Target "$listen_name" has no "$listen_on" method to recive events];
   }
 
-  $emitter_object->on( $emit_on, $self->_make_connector( $listener_object, $listen_on ) );
+  $self->log_debug(['Connecting %s#<%s> to %s#<%s>', $emit_name, $emit_on, $listen_name, $listen_on ]);
+  $emitter_object->on( $emit_on, _make_connector( $listener_object, $listen_on ) );
   return;
 
 }

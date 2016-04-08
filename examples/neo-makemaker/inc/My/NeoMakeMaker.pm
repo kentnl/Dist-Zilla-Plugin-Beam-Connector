@@ -60,6 +60,7 @@ sub gather_files {
     my $event =
       $self->emit( 'generate_prelude', class => 'My::MakeMaker::Prelude' );
 
+    $self->log_debug(["Prelude was <%s>", $event->prelude ]);
     my $templ = $template;
     $templ =~ s{XXXPRELUDEXXX}{ $event->prelude }sex;
 
