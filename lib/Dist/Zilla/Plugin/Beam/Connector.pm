@@ -59,7 +59,7 @@ sub _parse_on_directive {
   # Remove leading padding
   $connection_string =~ s/\A\s*//sx;
   $connection_string =~ s/\s*\z//sx;
-  if ( $connection_string =~ /\A(.+)\s*=>\s*(.+)\z/sx ) {
+  if ( $connection_string =~ /\A(.+?)\s*=>\s*(.+?)\z/sx ) {
     my ( $emitter, $listener ) = ( $1, $2 );
     return {
       emitter  => _parse_connector($emitter),
