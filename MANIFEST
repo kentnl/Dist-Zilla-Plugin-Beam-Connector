@@ -13,6 +13,9 @@ Makefile.PL
 README
 dist.ini
 dist.ini.meta
+examples/neo-makemaker/dist.ini
+examples/neo-makemaker/inc/My/MMArgsEvent.pm
+examples/neo-makemaker/inc/My/NeoMakeMaker.pm
 lib/Dist/Zilla/Plugin/Beam/Connector.pm
 maint/perlcritic.rc.gen.pl
 misc/Changes.deps
