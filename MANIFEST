@@ -14,6 +14,7 @@ README
 dist.ini
 dist.ini.meta
 examples/neo-makemaker/dist.ini
+examples/neo-makemaker/inc/My/NeoDynDeps.pm
 examples/neo-makemaker/inc/My/NeoMakeMaker.pm
 examples/neo-makemaker/lib/Example/NeoMaker.pm
 lib/Dist/Zilla/Plugin/Beam/Connector.pm
