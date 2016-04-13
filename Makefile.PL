@@ -17,16 +17,18 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Dist::Zilla::Plugin::Beam::Connector",
   "PREREQ_PM" => {
+    "Beam::Wire" => 0,
     "Carp" => 0,
     "Dist::Zilla::Role::Plugin" => 0,
     "Moose" => 0,
+    "MooseX::LazyRequire" => 0,
+    "Path::Tiny" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Path::Tiny" => 0,
     "Test::DZil" => 0,
     "Test::More" => "0.89",
     "constant" => 0,
@@ -40,11 +42,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Beam::Wire" => 0,
   "Carp" => 0,
   "Dist::Zilla::Role::Plugin" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Moose" => 0,
+  "MooseX::LazyRequire" => 0,
   "Path::Tiny" => 0,
   "Test::DZil" => 0,
   "Test::More" => "0.89",

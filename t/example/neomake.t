@@ -27,5 +27,11 @@ is( scalar @matches, 4, "4 lines added referencing Win32" );
 is( scalar( grep /MSWin32/i,     @matches ), 2, "2 lines added referencing MSWin32" );
 is( scalar( grep /Unsupported/i, @matches ), 2, "2 lines added referencing Unsupported" );
 
+my (@messages) = grep /This message brought/i, split /\n/, $file_content;
+note explain \@messages;
+is( scalar @messages, 2, "2 messages added by non-dzil code!" );
+is( scalar( grep /letter G/i, @messages ), 1, "Letter G arrived" );
+is( scalar( grep /letter M/i, @messages ), 1, "Letter M arrived" );
+
 done_testing;
 
