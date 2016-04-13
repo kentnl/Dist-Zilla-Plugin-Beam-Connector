@@ -8,7 +8,7 @@ package inc::My::NeoMakeMaker;
 
 # AUTHORITY
 
-use Moose qw( around extends with );
+use Moose qw( around extends with has );
 extends 'Dist::Zilla::Plugin::MakeMaker';
 with 'Beam::Emitter';
 use List::Util qw( first );
