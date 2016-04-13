@@ -11,7 +11,9 @@ our $VERSION = '0.001000';
 # AUTHORITY
 
 use Moose qw( has around with );
+use MooseX::LazyRequire;
 use Carp qw( croak );
+use Path::Tiny qw( path );
 with 'Dist::Zilla::Role::Plugin';
 
 has 'on' => (
@@ -20,11 +22,24 @@ has 'on' => (
   default => sub { [] },
 );
 
+has 'container' => (
+  isa           => 'Str',
+  is            => 'ro',
+  lazy_required => 1,
+);
+
 has '_on_parsed' => (
   isa     => 'ArrayRef',
   is      => 'ro',
   lazy    => 1,
   builder => '_build_on_parsed',
+);
+
+has '_container' => (
+  isa     => 'Ref',
+  is      => 'ro',
+  lazy    => 1,
+  builder => '_build_container',
 );
 
 around mvp_multivalue_args => sub {
@@ -49,8 +64,11 @@ sub _parse_connector {
   if ( $connector =~ /\Aplugin:(.+?)[#]([^#]+)\z/sx ) {
     return { type => 'plugin', name => "$1", connection => "$2", };
   }
+  if ( $connector =~ /\Acontainer:(.+?)[#]([^#]+)\z/sx ) {
+    return { type => 'container', name => "$1", connection => "$2", };
+  }
   croak "Invalid connector specification \"$connector\"\n"    #
-    . q[Didn't match "plugin:<id>#<event|listener>"];
+    . q[Didn't match "(plugin|container):<id>#<event|listener>"];
 }
 
 sub _parse_on_directive {
@@ -78,12 +96,16 @@ sub _find_connector {
     croak "Can't resolve plugin \"$spec->{name}\" to an instance.\n"    #
       . q[Did the plugin exist? Is the connection *after* it?];
   }
+  if ( 'container' eq $spec->{type} ) {
+    return $self->_container->get( $spec->{'name'} );
+  }
   croak "Unknown connector type \"$spec->{type}\"";
 }
 
 # This is to avoid making the sub a closure that contains the emitter
 sub _make_connector {
   my ( $recipient, $method_name ) = @_;
+
   # Maybe weak ref? IDK
   return sub {
     my ($event) = @_;
@@ -96,8 +118,8 @@ sub _connect {
   my $emitter_object  = $self->_find_connector($emitter);
   my $listener_object = $self->_find_connector($listener);
 
-  my $emit_name   = $emitter->{name};
-  my $listen_name = $listener->{name};
+  my $emit_name   = $emitter->{type} . $emitter->{name};
+  my $listen_name = $listener->{type} . $listener->{name};
 
   my $emit_on   = $emitter->{connection};
   my $listen_on = $listener->{connection};
@@ -109,7 +131,7 @@ sub _connect {
     croak qq[Listener Target "$listen_name" has no "$listen_on" method to recive events];
   }
 
-  $self->log_debug(['Connecting %s#<%s> to %s#<%s>', $emit_name, $emit_on, $listen_name, $listen_on ]);
+  $self->log_debug( [ 'Connecting %s#<%s> to %s#<%s>', $emit_name, $emit_on, $listen_name, $listen_on ] );
   $emitter_object->on( $emit_on, _make_connector( $listener_object, $listen_on ) );
   return;
 
@@ -118,6 +140,15 @@ sub _connect {
 sub _build_on_parsed {
   my ($self) = @_;
   return [ map { _parse_on_directive($_) } @{ $self->on } ];
+}
+
+sub _build_container {
+  my ($self) = @_;
+  my $file = $self->container;
+  require Beam::Wire;
+  $self->log_debug( [ 'Loading Beam::Wire container from %s', $file ] );
+  my $wire = Beam::Wire->new( file => path( $self->zilla->root, $file ) );
+  return $wire;
 }
 
 1;
@@ -131,6 +162,12 @@ sub _build_on_parsed {
   ; PluginA emitting event 'foo' passes the event to PluginB
   on   = plugin:PluginA#foo    =>   plugin:PluginB#handle_foo
   on   = plugin:PluginA#bar    =>   plugin:PluginB#handle_bar
+  ; Load 'beam.yml' as a Beam::Wire container
+  container = beam.yml
+  ; Handle Dist::Zilla plugin events with arbitrary classes
+  ; loaded by Beam::Wire
+  on   = plugin:PluginA#foo    =>   container:servicename#handle_foo
+  on   = plugin:PluginA#bar    =>   container:otherservicename#handle_bar
 
 =head1 DESCRIPTION
 

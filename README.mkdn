@@ -15,6 +15,12 @@ version 0.001000
     ; PluginA emitting event 'foo' passes the event to PluginB
     on   = plugin:PluginA#foo    =>   plugin:PluginB#handle_foo
     on   = plugin:PluginA#bar    =>   plugin:PluginB#handle_bar
+    ; Load 'beam.yml' as a Beam::Wire container
+    container = beam.yml
+    ; Handle Dist::Zilla plugin events with arbitrary classes
+    ; loaded by Beam::Wire
+    on   = plugin:PluginA#foo    =>   container:servicename#handle_foo
+    on   = plugin:PluginA#bar    =>   container:otherservicename#handle_bar
 
 # DESCRIPTION
 
