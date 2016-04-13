@@ -16,6 +16,11 @@ use List::Util qw( first );
 # PS: This example shows exactly how much you need to piss around with EUMM
 # just to get some basic stuff done.
 
+has 'static_attribution' => (
+    isa => 'Bool',
+    is  => 'ro',
+);
+
 around write_makefile_args => sub {
     my ( $orig, $self, @args ) = @_;
     my $args  = $self->$orig(@args);
@@ -60,7 +65,7 @@ sub gather_files {
     my $event =
       $self->emit( 'generate_prelude', class => 'My::MakeMaker::Prelude' );
 
-    $self->log_debug(["Prelude was <%s>", $event->prelude ]);
+    $self->log_debug( [ "Prelude was <%s>", $event->prelude ] );
     my $templ = $template;
     $templ =~ s{XXXPRELUDEXXX}{ $event->prelude }sex;
 
