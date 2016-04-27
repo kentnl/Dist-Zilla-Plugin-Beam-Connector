@@ -250,4 +250,61 @@ and then C<MakeMaker> can integrate the injected events at "wherever" the right 
 This is much superior to scraping the generated text file and injecting events
 at a given place based on a C<RegEx> match.
 
+=head1 PARAMETERS
+
+=head2 C<container>
+
+Allows loading an arbitrary C<Beam::Wire> container L<< specification|Beam::Wire::Help::Config >>, initializing the
+relevant objects lazily, and connecting them to relevant events emitted by C<dzil> plugins.
+
+  [Beam::Connector]
+  container = inc/dist_beam.yml
+
+The value can be a path to any file name that C<< Beam::Wire->new( file => ... ) >> understands, (which itself
+is any file name that C<< Config::Any->load_files >> understands).
+
+Items in loaded container can then be referred to by their identifiers to the L<< C<on>|/on >> parameter in the form
+
+  container:${name}#${method}
+
+For example:
+
+  [Beam::Connector]
+  container = inc/dist_beam.yml
+  on = plugin:GatherDir#gather_files => container:file_gatherer#on_gather_files
+
+This would register the object called C<file_gatherer> inside the container to be a recipient of any events called
+C<gather_files> emitted by the plugin I<named> C<GatherDir>
+
+=head2 C<on>
+
+Defines a connection between an event emitter and a listener.
+
+The general syntax is:
+
+  on = emitterspec => listenerspec
+
+Where C<emitterspec> and C<listenerspec> are of the form
+
+  objectnamespace:objectname#connector
+
+=head3 C<objectnamespace>
+
+There are presently two defined object name-spaces.
+
+=over 4
+
+=item * C<plugin>: Resolves C<objectname> to a C<Dist::Zilla> plugin by its C<name> identifier
+
+=item * C<container>: Resolves C<objectname> to an explicitly named object inside an associated L<< C<container>|/container >>
+
+=back
+
+=head3 C<connector>
+
+For an C<emitter>, the C<connector> property identifies the name of the event that is expected to be emitted by
+that C<emitter>
+
+For a C<listener>, the C<connector> property identifies the name of a C<method> that is expected to receive the event.
+
 =cut

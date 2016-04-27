@@ -91,6 +91,58 @@ and then `MakeMaker` can integrate the injected events at "wherever" the right p
 This is much superior to scraping the generated text file and injecting events
 at a given place based on a `RegEx` match.
 
+# PARAMETERS
+
+## `container`
+
+Allows loading an arbitrary `Beam::Wire` container [specification](https://metacpan.org/pod/Beam::Wire::Help::Config), initializing the
+relevant objects lazily, and connecting them to relevant events emitted by `dzil` plugins.
+
+    [Beam::Connector]
+    container = inc/dist_beam.yml
+
+The value can be a path to any file name that `Beam::Wire->new( file => ... )` understands, (which itself
+is any file name that `Config::Any->load_files` understands).
+
+Items in loaded container can then be referred to by their identifiers to the [`on`](#on) parameter in the form
+
+    container:${name}#${method}
+
+For example:
+
+    [Beam::Connector]
+    container = inc/dist_beam.yml
+    on = plugin:GatherDir#gather_files => container:file_gatherer#on_gather_files
+
+This would register the object called `file_gatherer` inside the container to be a recipient of any events called
+`gather_files` emitted by the plugin _named_ `GatherDir`
+
+## `on`
+
+Defines a connection between an event emitter and a listener.
+
+The general syntax is:
+
+    on = emitterspec => listenerspec
+
+Where `emitterspec` and `listenerspec` are of the form
+
+    objectnamespace:objectname#connector
+
+### `objectnamespace`
+
+There are presently two defined object name-spaces.
+
+- `plugin`: Resolves `objectname` to a `Dist::Zilla` plugin by its `name` identifier
+- `container`: Resolves `objectname` to an explicitly named object inside an associated [`container`](#container)
+
+### `connector`
+
+For an `emitter`, the `connector` property identifies the name of the event that is expected to be emitted by
+that `emitter`
+
+For a `listener`, the `connector` property identifies the name of a `method` that is expected to receive the event.
+
 # AUTHOR
 
 Kent Fredric &lt;kentnl@cpan.org>
