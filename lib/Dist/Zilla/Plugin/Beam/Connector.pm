@@ -26,6 +26,7 @@ has 'container' => (
   isa           => 'Str',
   is            => 'ro',
   lazy_required => 1,
+  predicate     => '_has_container',
 );
 
 has '_on_parsed' => (
@@ -54,6 +55,25 @@ around plugin_from_config => sub {
     $instance->_connect( $connection->{emitter}, $connection->{listener} );
   }
   return $instance;
+};
+
+around dump_config => sub {
+  my ( $orig, $self, @args ) = @_;
+  my $config = $self->$orig(@args);
+  my $payload = $config->{ +__PACKAGE__ } = {};
+  $payload->{'on'} = $self->on;
+  if ( $self->_has_container ) {
+    $payload->{'container'}             = $self->container;
+    $payload->{'container.config.keys'} = [ sort keys %{ $self->_container->config } ];
+  }
+
+  ## no critic (RequireInterpolationOfMetachars)
+  # Skip reporting this unless somebody inherits us.
+  $payload->{ q[$] . __PACKAGE__ . '::VERSION' } = $VERSION unless __PACKAGE__ eq ref $self;
+  $payload->{'$Beam::Wire::VERSION'}    = $Beam::Wire::VERSION  if $INC{'Beam/Wire.pm'};
+  $payload->{'$Beam::Event::VERSION'}   = $Beam::Event::VERSION if $INC{'Beam/Event.pm'};
+  $payload->{'$Beam::Emitter::VERSION'} = $Beam::Event::VERSION if $INC{'Beam/Emitter.pm'};
+  return $config;
 };
 
 __PACKAGE__->meta->make_immutable;
