@@ -441,4 +441,153 @@ and marks the event as "stopped", L<< in addition to being "default_stopped"|Bea
   }
   # do appending here
 
+=head1 WRITING EVENT LISTENERS
+
+Fortunately, the requirements for an Event Receiver is B<very> low.
+
+=head2 Receiving Events
+
+If you're using the C<Dist::Zilla::Plugin>/C<plugin:> approach, all that is required is
+
+=over 4
+
+=item * A Valid C<Dist::Zilla> plugin that registers in C<< $zilla->plugins >>
+
+=item * Some method name of any description that can be passed an argument
+
+=back
+
+For Example:
+
+  package My::Plugin;
+
+  use Moose;
+  with 'Dist::Zilla::Role::Plugin';
+
+  sub on_before_append {
+    my ( $self, $event ) = @_;
+    ...
+  }
+
+If you're using the C<Beam::Wire>/C<container:> approach, all that is required is:
+
+=over 4
+
+=item * A named object
+
+=item * Some method name of any description that can be passed an argument
+
+=back
+
+For Example:
+
+  package My::Listener;
+
+  sub new { bless {}, $_[0] }
+
+  sub on_before_append {
+    my ( $self, $event ) = @_;
+    ...
+  }
+
+These listeners will do nothing on their own, but have events routed to them by
+relevant C<Beam> configuration.
+
+=head2 Identifying and Handling Events
+
+Your method will be called with one argument: The event.
+
+  sub on_whatever {
+    my ( $self, $event ) = @_;
+
+  }
+
+What sort of events you receive of course depends on who sent them.
+
+You can then filter them the same way as you would with any Perl Object,
+via C<< ->isa >> etc,
+
+  sub on_whatever {
+    my ( $self, $event ) = @_;
+    if ( $event->isa('Dist::Zilla::Plugin::Prepender::AppenderEvent') ) {
+
+    }
+  }
+
+But you can identify events by other means, via the C<< ->name >> property.
+
+  sub on_whatever {
+    my ( $self, $event ) = @_;
+    if ( q[before_append] eq $event->name ) ) {
+
+    }
+  }
+
+You can then read the data of the event, or potentially modify it in-place, to communicate
+data back to the sender of the event.
+
+  sub on_whatever {
+    my ( $self, $event ) = @_;
+    if ( q[before_append] eq $event->name ) ) {
+      push @{$event->lines}, 'use Moose;' if $event->filename =~ /\bMooseX\b/; # Rediculous example I know.
+    }
+  }
+
+But you don't need to return anything from the C<sub>, return values are entirely ignored.
+
+=head2 Repressing Defaults
+
+As every Emitter can have 1 or More listeners subscribed, and they have a
+specific order of execution, there is a need for some level of flow control on the listeners side.
+
+One such control is L<< C<stop_default>|Beam::Event/stop_default >> which simply sets a flag C<is_default_stopped> on the event.
+
+What this will actually do depends on how the event was sent.
+
+The L<< recommended usage is|/Using events to replace default behavior >> for the event emitter to use that flag,
+when set, to repress some kind of default behavior at some time after calling all the listeners.
+
+  sub on_whatever {
+    my ( $self, $event ) = @_;
+    # Mangle event
+    $event->stop_default;
+  }
+
+=head2 Stopping Events
+
+The L<< C<stop>|Beam::Event/stop >> control is similar to the L<< C<stop_default>|/Repressing Defaults >> control,
+in that, how it affects the emitter varies depending on how they implemented it.
+
+Calling C<stop_default> only sets the C<is_default_stopped> flag.
+
+B<C<stop>> however, sets I<both> that flag and C<is_stopped> flag, and the emitter could have handlers for either or both!.
+
+B<C<stop>> also has one very important difference from C<stop_default>:
+
+B<< It prevents other registered listeners in the same slot receiving the event afterwards >>
+
+  sub on_comet {
+    my ( $self, $event ) = @_;
+    # ...
+  }
+
+  sub on_cupid {
+    my ( $self, $event ) = @_;
+    # Mangle event
+    $event->stop;
+  }
+
+  sub on_dunder {
+    my ( $self, $event ) = @_;
+    # ...
+  }
+
+  [Beam::Connector]
+  on = plugin:emitter#emit_event => plugin:receiver:on_comet
+  on = plugin:emitter#emit_event => plugin:receiver:on_cupid
+  on = plugin:emitter#emit_event => plugin:receiver:on_dunder
+
+In this configuration, C<on_comet> fires, so does C<on_cupid>.
+But C<on_dunder> never calls because of the C<< ->stop >> control from C<on_cupid>
+
 =cut
