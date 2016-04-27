@@ -143,6 +143,120 @@ that `emitter`
 
 For a `listener`, the `connector` property identifies the name of a `method` that is expected to receive the event.
 
+# WRITING EVENT EMITTERS
+
+Adding support for hookable events in new and existing `Dist::Zilla` plugins is relatively straight-forward,
+and uses [`Beam::Emitter`](https://metacpan.org/pod/Beam::Emitter)
+
+    # Somewhere after `use Moose`
+    with "Beam::Emitter";
+
+And your class is now ready to broadcast events, and plugins are now able to hook events. Even though they don't
+exist yet.
+
+But that's not very useful in itself. You need to find good places in your code to write events, and construct
+little bundles of state, "messages" to pass around, and perhaps, allow modifying.
+
+## Designing an Event
+
+You want to start off designing an event class that communicates the _absolute minimum_ required to be useful.
+
+Carrying too much state, or too much indirect state is the enemy.
+
+For instance, it would generally be unwise to design an Event that you passed to something which carried a `$zilla`
+instance with it.
+
+You want to make it as obscure as possible who is even sending the event, as the contents of the event should be usable
+in total isolation, because you have no idea where your events are going to get sent ( because that is outside the
+scope of your plugin ), and receivers have no solid expectations of where events are going to come from ( because that
+is dictated by the connector ).
+
+## Implementing an Event
+
+Events themselves are quite straight forward: They're just objects, objects extending
+[`Beam::Event`](https://metacpan.org/pod/Beam::Event).
+
+It is presently recommended you define these events inline somewhere, either in the plugin that emits them,
+or in some shared container.
+
+It is also recommended to _NOT_ index said Event packages at present.
+
+This is an example event definition: It will communicate a file name it intends to prepend lines to
+and pass a mutable, empty array for the event handler to inject lines into.
+
+    package # hide from PAUSE
+      Dist::Zilla::Plugin::Prepender::AppenderEvent;
+
+    use Moose;  # or Moo, both work
+    extends "Beam::Event"
+
+    has 'filename' => (
+        is       => 'ro',
+        isa      => Str,
+        required => 1,
+    );
+    has 'lines' => (
+        is      => 'rw',
+        isa     => ArrayRef[Str],
+        lazy    => 1,
+        default => sub { [] },
+    );
+    __PACKAGE__->meta->make_immutable;
+
+See [Using Custom Events in Beam::Emitter](https://metacpan.org/pod/Beam::Emitter#Using-Custom-Events) for details.
+
+## Emitting and Handling an Event
+
+Once you have an Event class designed, gluing it into your code is also quite simple:
+
+    # somewhere deep in your plugin
+
+    my $event = $self->emit(
+      'before_append',                                          # the "name" of the event, this corresponds to the "connector"
+                                                                # property in Beam::Connector
+
+      class => 'Dist::Zilla::Plugin::Prepender::AppenderEvent', # The class to construct an instance of
+
+      filename => 'lib/Foo.pm',                                 # attribute property of the Event object.
+    );
+
+An instance of `class` is created with the defined name, and is passed in-order to all the objects who subscribed to the
+`before_append` event, and then returned once they're done.
+
+And then you can extract any of the state in the passed object and use it to do your work.
+
+### Using events to replace default behavior
+
+You can optionally use the event system as a way to toggle between default and customized behavior.
+
+For instance:
+
+    my $event = $self->emit("before_append" ... );
+    if ( !$event->is_default_stopped ) {
+      unshift, @{$event->lines}, 'use strict;','use warnings;';
+    }
+
+With this configuration, all the events registered will run, and the later block
+can be turned off by any events in the stack.
+
+### "Stopped" events
+
+Event receivers can also indicate to "stop" an event in somehow.
+
+"Stopping" an event skips all subsequent registered listeners,
+and marks the event as "stopped", [in addition to being "default\_stopped"](https://metacpan.org/pod/Beam::Event#stop)
+
+    my $event = $self->emit("before_append" ... );
+    if ( !$event->is_default_stopped ) {
+      # Won't fire after either a ->stop or a ->stop_default
+      unshift, @{$event->lines}, 'use strict;','use warnings;';
+    }
+    if ( $event->is_stopped ) {
+      # Won't fire with ->stop_default, but will fire with ->stop
+      return;
+    }
+    # do appending here
+
 # AUTHOR
 
 Kent Fredric &lt;kentnl@cpan.org>
