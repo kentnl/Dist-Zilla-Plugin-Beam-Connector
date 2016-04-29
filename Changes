@@ -1,5 +1,7 @@
 Release history for Dist-Zilla-Plugin-Beam-Connector
 
+0.001001 2016-04-29T07:36:16Z 75d0f96
+ - Revised and improved recommendations around namespacing and packaging
+
 0.001000 2016-04-29T06:41:35Z db240bf
  - First version.
-
