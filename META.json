@@ -178,14 +178,18 @@
                   ]
                },
                "Dist::Zilla::Role::MetaProvider::Provider" : {
-                  "Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.001010",
+                  "Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002000",
                   "inherit_missing" : "1",
                   "inherit_version" : "1",
                   "meta_noindex" : "1"
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000031",
+                  "version" : "0.003"
                }
             },
             "name" : "@Author::KENTNL/MetaProvides::Package",
-            "version" : "2.003001"
+            "version" : "2.004000"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaData::BuiltWith",
