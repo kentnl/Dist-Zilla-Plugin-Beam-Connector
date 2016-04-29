@@ -171,21 +171,41 @@ in total isolation, because you have no idea where your events are going to get 
 scope of your plugin ), and receivers have no solid expectations of where events are going to come from ( because that
 is dictated by the connector ).
 
+## Namespace and Indexing recommendations
+
+It is presently recommended you define these events inline somewhere, either in the plugin that emits them,
+or in some shared container.
+
+The **recommended namespace** scheme to follow is:
+
+    Dist::Zilla::Event::
+
+Preferably, structuring it similar to your plugin
+
+    Dist::Zilla::Plugin::Thing::Dooer
+    Dist::Zilla::Event::Thing::Dooer::BeforeDoingThing
+
+This I'm sure you'll agree is much nicer than
+
+    Dist::Zilla::Plugin::Thing::Dooer::BeforeDoingThingEvent # O_O
+    Dist::Zilla::Plugin::BeforeDoingThingEvent               # Not a plugin
+
+It is also recommended to _NOT_ index said Event packages at present, as that
+would encourage people depending on the events at some point, which for this system, is
+likely unwanted toxicity.
+
+Only people emitting events should be caring about loading the class.
+
 ## Implementing an Event
 
 Events themselves are quite straight forward: They're just objects, objects extending
 [`Beam::Event`](https://metacpan.org/pod/Beam::Event).
 
-It is presently recommended you define these events inline somewhere, either in the plugin that emits them,
-or in some shared container.
-
-It is also recommended to _NOT_ index said Event packages at present.
-
 This is an example event definition: It will communicate a file name it intends to prepend lines to
 and pass a mutable, empty array for the event handler to inject lines into.
 
     package # hide from PAUSE
-      Dist::Zilla::Plugin::Prepender::AppenderEvent;
+      Dist::Zilla::Event::Prepender::BeforePrepend;
 
     use Moose;  # or Moo, both work
     extends "Beam::Event"
@@ -215,7 +235,7 @@ Once you have an Event class designed, gluing it into your code is also quite si
       'before_append',                                          # the "name" of the event, this corresponds to the "connector"
                                                                 # property in Beam::Connector
 
-      class => 'Dist::Zilla::Plugin::Prepender::AppenderEvent', # The class to construct an instance of
+      class => 'Dist::Zilla::Event::Prepender::BeforePrepend',  # The class to construct an instance of
 
       filename => 'lib/Foo.pm',                                 # attribute property of the Event object.
     );
