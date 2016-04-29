@@ -409,38 +409,6 @@ C<before_append> event, and then returned once they're done.
 
 And then you can extract any of the state in the passed object and use it to do your work.
 
-=head3 Using events to replace default behavior
-
-You can optionally use the event system as a way to toggle between default and customized behavior.
-
-For instance:
-
-  my $event = $self->emit("before_append" ... );
-  if ( !$event->is_default_stopped ) {
-    unshift, @{$event->lines}, 'use strict;','use warnings;';
-  }
-
-With this configuration, all the events registered will run, and the later block
-can be turned off by any events in the stack.
-
-=head3 "Stopped" events
-
-Event receivers can also indicate to "stop" an event in somehow.
-
-"Stopping" an event skips all subsequent registered listeners,
-and marks the event as "stopped", L<< in addition to being "default_stopped"|Beam::Event/stop >>
-
-  my $event = $self->emit("before_append" ... );
-  if ( !$event->is_default_stopped ) {
-    # Won't fire after either a ->stop or a ->stop_default
-    unshift, @{$event->lines}, 'use strict;','use warnings;';
-  }
-  if ( $event->is_stopped ) {
-    # Won't fire with ->stop_default, but will fire with ->stop
-    return;
-  }
-  # do appending here
-
 =head1 WRITING EVENT LISTENERS
 
 Fortunately, the requirements for an Event Receiver is B<very> low.
@@ -535,59 +503,12 @@ data back to the sender of the event.
 
 But you don't need to return anything from the C<sub>, return values are entirely ignored.
 
-=head2 Repressing Defaults
+=head1 FOOTNOTE
 
-As every Emitter can have 1 or More listeners subscribed, and they have a
-specific order of execution, there is a need for some level of flow control on the listeners side.
+=for stopwords intra API
 
-One such control is L<< C<stop_default>|Beam::Event/stop_default >> which simply sets a flag C<is_default_stopped> on the event.
+C<Beam::Event> and C<Beam::Emitter> have some tools for controlling intra-event flow,
+however, their usage is not 100% clear and their API may be subject to change in future.
 
-What this will actually do depends on how the event was sent.
-
-The L<< recommended usage is|/Using events to replace default behavior >> for the event emitter to use that flag,
-when set, to repress some kind of default behavior at some time after calling all the listeners.
-
-  sub on_whatever {
-    my ( $self, $event ) = @_;
-    # Mangle event
-    $event->stop_default;
-  }
-
-=head2 Stopping Events
-
-The L<< C<stop>|Beam::Event/stop >> control is similar to the L<< C<stop_default>|/Repressing Defaults >> control,
-in that, how it affects the emitter varies depending on how they implemented it.
-
-Calling C<stop_default> only sets the C<is_default_stopped> flag.
-
-B<C<stop>> however, sets I<both> that flag and C<is_stopped> flag, and the emitter could have handlers for either or both!.
-
-B<C<stop>> also has one very important difference from C<stop_default>:
-
-B<< It prevents other registered listeners in the same slot receiving the event afterwards >>
-
-  sub on_comet {
-    my ( $self, $event ) = @_;
-    # ...
-  }
-
-  sub on_cupid {
-    my ( $self, $event ) = @_;
-    # Mangle event
-    $event->stop;
-  }
-
-  sub on_dunder {
-    my ( $self, $event ) = @_;
-    # ...
-  }
-
-  [Beam::Connector]
-  on = plugin:emitter#emit_event => plugin:receiver:on_comet
-  on = plugin:emitter#emit_event => plugin:receiver:on_cupid
-  on = plugin:emitter#emit_event => plugin:receiver:on_dunder
-
-In this configuration, C<on_comet> fires, so does C<on_cupid>.
-But C<on_dunder> never calls because of the C<< ->stop >> control from C<on_cupid>
-
-=cut
+So I have deleted the L<< relevant instruction on this|https://github.com/kentnl/Dist-Zilla-Plugin-Beam-Connector/compare/1c312f2...5025113 >>
+and it will be resurrected when I'm more sure about how it should be instructed.

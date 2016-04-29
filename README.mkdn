@@ -225,38 +225,6 @@ An instance of `class` is created with the defined name, and is passed in-order 
 
 And then you can extract any of the state in the passed object and use it to do your work.
 
-### Using events to replace default behavior
-
-You can optionally use the event system as a way to toggle between default and customized behavior.
-
-For instance:
-
-    my $event = $self->emit("before_append" ... );
-    if ( !$event->is_default_stopped ) {
-      unshift, @{$event->lines}, 'use strict;','use warnings;';
-    }
-
-With this configuration, all the events registered will run, and the later block
-can be turned off by any events in the stack.
-
-### "Stopped" events
-
-Event receivers can also indicate to "stop" an event in somehow.
-
-"Stopping" an event skips all subsequent registered listeners,
-and marks the event as "stopped", [in addition to being "default\_stopped"](https://metacpan.org/pod/Beam::Event#stop)
-
-    my $event = $self->emit("before_append" ... );
-    if ( !$event->is_default_stopped ) {
-      # Won't fire after either a ->stop or a ->stop_default
-      unshift, @{$event->lines}, 'use strict;','use warnings;';
-    }
-    if ( $event->is_stopped ) {
-      # Won't fire with ->stop_default, but will fire with ->stop
-      return;
-    }
-    # do appending here
-
 # WRITING EVENT LISTENERS
 
 Fortunately, the requirements for an Event Receiver is **very** low.
@@ -341,60 +309,13 @@ data back to the sender of the event.
 
 But you don't need to return anything from the `sub`, return values are entirely ignored.
 
-## Repressing Defaults
+# FOOTNOTE
 
-As every Emitter can have 1 or More listeners subscribed, and they have a
-specific order of execution, there is a need for some level of flow control on the listeners side.
+`Beam::Event` and `Beam::Emitter` have some tools for controlling intra-event flow,
+however, their usage is not 100% clear and their API may be subject to change in future.
 
-One such control is [`stop_default`](https://metacpan.org/pod/Beam::Event#stop_default) which simply sets a flag `is_default_stopped` on the event.
-
-What this will actually do depends on how the event was sent.
-
-The [recommended usage is](#using-events-to-replace-default-behavior) for the event emitter to use that flag,
-when set, to repress some kind of default behavior at some time after calling all the listeners.
-
-    sub on_whatever {
-      my ( $self, $event ) = @_;
-      # Mangle event
-      $event->stop_default;
-    }
-
-## Stopping Events
-
-The [`stop`](https://metacpan.org/pod/Beam::Event#stop) control is similar to the [`stop_default`](#repressing-defaults) control,
-in that, how it affects the emitter varies depending on how they implemented it.
-
-Calling `stop_default` only sets the `is_default_stopped` flag.
-
-**`stop`** however, sets _both_ that flag and `is_stopped` flag, and the emitter could have handlers for either or both!.
-
-**`stop`** also has one very important difference from `stop_default`:
-
-**It prevents other registered listeners in the same slot receiving the event afterwards**
-
-    sub on_comet {
-      my ( $self, $event ) = @_;
-      # ...
-    }
-
-    sub on_cupid {
-      my ( $self, $event ) = @_;
-      # Mangle event
-      $event->stop;
-    }
-
-    sub on_dunder {
-      my ( $self, $event ) = @_;
-      # ...
-    }
-
-    [Beam::Connector]
-    on = plugin:emitter#emit_event => plugin:receiver:on_comet
-    on = plugin:emitter#emit_event => plugin:receiver:on_cupid
-    on = plugin:emitter#emit_event => plugin:receiver:on_dunder
-
-In this configuration, `on_comet` fires, so does `on_cupid`.
-But `on_dunder` never calls because of the `->stop` control from `on_cupid`
+So I have deleted the [relevant instruction on this](https://github.com/kentnl/Dist-Zilla-Plugin-Beam-Connector/compare/1c312f2...5025113)
+and it will be resurrected when I'm more sure about how it should be instructed.
 
 # AUTHOR
 
