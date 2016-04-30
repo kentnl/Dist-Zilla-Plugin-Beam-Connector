@@ -1,6 +1,12 @@
 Release history for Dist-Zilla-Plugin-Beam-Connector
 
 {{$NEXT}}
+ - Include a few missing testing dependencies that got hidden in the example
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see misc/*.deps* for details
+ - develop: +1
+ - test: +5
 
 0.001001 2016-04-29T07:36:16Z 75d0f96
  - Revised and improved recommendations around namespacing and packaging

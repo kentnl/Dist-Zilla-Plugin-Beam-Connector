@@ -21,3 +21,6 @@ srcreadme         = mkdn
 
 [Prereqs]
 
+[FileFinder::ByName / :TestFiles]
+match = \At/
+match = \Aexamples/
