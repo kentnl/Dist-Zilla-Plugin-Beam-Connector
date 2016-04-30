@@ -1,5 +1,7 @@
 Release history for Dist-Zilla-Plugin-Beam-Connector
 
+0.001003 2016-04-30T22:07:47Z bab3417
+
 0.001002 2016-04-30T20:31:19Z 91ceba7
  - Include a few missing testing dependencies that got hidden in the example
 
