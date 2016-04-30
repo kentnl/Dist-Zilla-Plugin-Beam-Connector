@@ -3,8 +3,13 @@ abstract: 'Connect events to listeners in Dist::Zilla plugins.'
 author:
   - 'Kent Fredric <kentnl@cpan.org>'
 build_requires:
+  Beam::Emitter: '0'
+  Beam::Event: '0'
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Plugin::MakeMaker: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  List::Util: '0'
   Test::DZil: '0'
   Test::More: '0.89'
   constant: '0'
@@ -23,7 +28,7 @@ name: Dist-Zilla-Plugin-Beam-Connector
 provides:
   Dist::Zilla::Plugin::Beam::Connector:
     file: lib/Dist/Zilla/Plugin/Beam/Connector.pm
-    version: '0.001001'
+    version: '0.001002'
 recommends:
   Moose: '2.000'
   Path::Tiny: '0.058'
@@ -41,4 +46,4 @@ resources:
   bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-Beam-Connector/issues
   homepage: https://github.com/kentnl/Dist-Zilla-Plugin-Beam-Connector
   repository: https://github.com/kentnl/Dist-Zilla-Plugin-Beam-Connector.git
-version: '0.001001'
+version: '0.001002'

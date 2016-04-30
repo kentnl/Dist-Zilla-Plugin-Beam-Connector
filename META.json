@@ -37,6 +37,7 @@
             "Dist::Zilla::Plugin::BumpVersionAfterRelease" : "0",
             "Dist::Zilla::Plugin::ConfirmRelease" : "0",
             "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
+            "Dist::Zilla::Plugin::FileFinder::ByName" : "0",
             "Dist::Zilla::Plugin::Git::Check" : "0",
             "Dist::Zilla::Plugin::Git::Commit" : "0",
             "Dist::Zilla::Plugin::Git::CommitBuild" : "0",
@@ -118,8 +119,13 @@
             "Test::More" : "0.99"
          },
          "requires" : {
+            "Beam::Emitter" : "0",
+            "Beam::Event" : "0",
+            "Dist::Zilla::File::InMemory" : "0",
+            "Dist::Zilla::Plugin::MakeMaker" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
+            "List::Util" : "0",
             "Test::DZil" : "0",
             "Test::More" : "0.89",
             "constant" : "0",
@@ -131,7 +137,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::Beam::Connector" : {
          "file" : "lib/Dist/Zilla/Plugin/Beam/Connector.pm",
-         "version" : "0.001001"
+         "version" : "0.001002"
       }
    },
    "release_status" : "stable",
@@ -146,7 +152,7 @@
          "web" : "https://github.com/kentnl/Dist-Zilla-Plugin-Beam-Connector"
       }
    },
-   "version" : "0.001001",
+   "version" : "0.001002",
    "x_BuiltWith" : {
       "external_file" : "misc/built_with.json"
    },
@@ -659,7 +665,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.001001-source",
+                  "tag" : "0.001002-source",
                   "tag_format" : "%v-source",
                   "tag_message" : "v%v"
                },
@@ -750,7 +756,7 @@
                   "branch" : "releases",
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.001001",
+                  "tag" : "0.001002",
                   "tag_format" : "%v",
                   "tag_message" : "v%v"
                },
@@ -843,6 +849,11 @@
             "version" : "5.043"
          },
          {
+            "class" : "Dist::Zilla::Plugin::FileFinder::ByName",
+            "name" : ":TestFiles",
+            "version" : "5.043"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
             "version" : "5.043"
@@ -850,11 +861,6 @@
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "5.043"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::FinderCode",
-            "name" : ":TestFiles",
             "version" : "5.043"
          },
          {

@@ -1,3 +1,14 @@
 This file contains ALL changes in dependencies in both REQUIRED / OPTIONAL dependencies for all phases (configure/build/runtime/test/develop)
 
-0.001001
+0.001002
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::FileFinder::ByName
+
+ [Added / test requires]
+ - Beam::Emitter
+ - Beam::Event
+ - Dist::Zilla::File::InMemory
+ - Dist::Zilla::Plugin::MakeMaker
+ - List::Util
+
+0.001001 2016-04-29T07:36:16Z

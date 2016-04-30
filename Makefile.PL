@@ -27,14 +27,19 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Beam::Emitter" => 0,
+    "Beam::Event" => 0,
+    "Dist::Zilla::File::InMemory" => 0,
+    "Dist::Zilla::Plugin::MakeMaker" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "List::Util" => 0,
     "Test::DZil" => 0,
     "Test::More" => "0.89",
     "constant" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.001001",
+  "VERSION" => "0.001002",
   "test" => {
     "TESTS" => "t/*.t t/00-compile/*.t t/example/*.t"
   }
@@ -42,11 +47,16 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Beam::Emitter" => 0,
+  "Beam::Event" => 0,
   "Beam::Wire" => 0,
   "Carp" => 0,
+  "Dist::Zilla::File::InMemory" => 0,
+  "Dist::Zilla::Plugin::MakeMaker" => 0,
   "Dist::Zilla::Role::Plugin" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "List::Util" => 0,
   "Moose" => 0,
   "MooseX::LazyRequire" => 0,
   "Path::Tiny" => 0,

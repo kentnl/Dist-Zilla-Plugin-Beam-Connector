@@ -4,7 +4,7 @@ use warnings;
 
 package Dist::Zilla::Plugin::Beam::Connector;
 
-our $VERSION = '0.001001';
+our $VERSION = '0.001002';
 
 # ABSTRACT: Connect events to listeners in Dist::Zilla plugins.
 
@@ -185,7 +185,7 @@ Dist::Zilla::Plugin::Beam::Connector - Connect events to listeners in Dist::Zill
 
 =head1 VERSION
 
-version 0.001001
+version 0.001002
 
 =head1 SYNOPSIS
 
