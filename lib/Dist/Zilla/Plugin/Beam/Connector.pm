@@ -167,7 +167,7 @@ sub _build_container {
   my $file = $self->container;
   require Beam::Wire;
   $self->log_debug( [ 'Loading Beam::Wire container from %s', $file ] );
-  my $wire = Beam::Wire->new( file => path( $self->zilla->root, $file ) );
+  my $wire = Beam::Wire->new( file => q[] . path( $self->zilla->root, $file ) );
   return $wire;
 }
 
