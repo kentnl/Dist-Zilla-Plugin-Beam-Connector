@@ -4,7 +4,7 @@ use warnings;
 
 package Dist::Zilla::Plugin::Beam::Connector;
 
-our $VERSION = '0.001002';
+our $VERSION = '0.001003';
 
 # ABSTRACT: Connect events to listeners in Dist::Zilla plugins.
 
@@ -167,7 +167,7 @@ sub _build_container {
   my $file = $self->container;
   require Beam::Wire;
   $self->log_debug( [ 'Loading Beam::Wire container from %s', $file ] );
-  my $wire = Beam::Wire->new( file => path( $self->zilla->root, $file ) );
+  my $wire = Beam::Wire->new( file => q[] . path( $self->zilla->root, $file ) );
   return $wire;
 }
 
@@ -185,7 +185,7 @@ Dist::Zilla::Plugin::Beam::Connector - Connect events to listeners in Dist::Zill
 
 =head1 VERSION
 
-version 0.001002
+version 0.001003
 
 =head1 SYNOPSIS
 
@@ -554,7 +554,7 @@ Kent Fredric <kentnl@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Kent Fredric <kentfredric@gmail.com>.
+This software is copyright (c) 2017 by Kent Fredric <kentfredric@gmail.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
