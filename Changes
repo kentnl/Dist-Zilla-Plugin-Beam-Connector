@@ -1,6 +1,8 @@
 Release history for Dist-Zilla-Plugin-Beam-Connector
 
 {{$NEXT}}
+
+0.001003 2017-03-07T07:53:59Z cf919e4
  [Bugfix]
  - Ensure Beam::Wire doesn't fail by passing it a stringifed File instead of an object
  - Avoid test failures with -Ddefault_inc_excludes_dot
