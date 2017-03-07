@@ -1,10 +1,8 @@
 {
-   "failures" : {
-      "Beam::Wire" : "module was not found in INC"
-   },
    "modules" : {
       "Beam::Emitter" : "1.007",
       "Beam::Event" : "1.007",
+      "Beam::Wire" : "1.019",
       "CPAN::Meta" : "2.150010",
       "Carp" : "1.42",
       "Dist::Zilla" : "6.009",

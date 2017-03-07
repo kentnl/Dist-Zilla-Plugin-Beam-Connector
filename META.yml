@@ -28,7 +28,7 @@ name: Dist-Zilla-Plugin-Beam-Connector
 provides:
   Dist::Zilla::Plugin::Beam::Connector:
     file: lib/Dist/Zilla/Plugin/Beam/Connector.pm
-    version: '0.001003'
+    version: '0.001004'
 recommends:
   Moose: '2.000'
   Path::Tiny: '0.058'
@@ -46,4 +46,4 @@ resources:
   bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-Beam-Connector/issues
   homepage: https://github.com/kentnl/Dist-Zilla-Plugin-Beam-Connector
   repository: https://github.com/kentnl/Dist-Zilla-Plugin-Beam-Connector.git
-version: '0.001003'
+version: '0.001004'
